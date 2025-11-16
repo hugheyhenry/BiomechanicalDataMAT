@@ -11,55 +11,21 @@ tic;
 Font_Size = 12;
 syms H M L
 
-% Directory Name Change per Subject
-% Directory_Location = 'C:\Users\Henry\Downloads\VIPSTUFF';
-% change directory location for my computer here
-% procesed data reading needs to be dynamically sized, inside loop
-%Double %% brings to location
-% For psuedocode, create this break to easily navigate 
-% Idea is to create 1 giant struct for EACH subject
-% example name: H4M6L12
-% each field will have a file associated with it, follow same naming
-% convention
-% Goal for first week, be able to call the files in each struct e
-% focus reading loop for this week 
-% 1 struct instead of 9 tables, be able to call structres for data access
-
 Weight_Range = [H, M, L]
-Location_Range = [4, 6, 12];
-subjectNumber = 02;     
-%% Reading loop
+Location_Range = [1,2,3,4,5,6,7,8,9,10,11,12];
+subjectNumber = 01;     
+%% Reading loop - Subject Structure
 subjectStruct = struct()
 for i = 1:length(Weight_Range)
        Weight = Weight_Range(i)
        for j = 1:length(Location_Range)
        Location = Location_Range(j)
-       fidProcessed = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) % file ID, concatenating name, processed data
+       fidProcessed = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) % file ID, concatenating name, processed data
        completedRead = readtable(fidProcessed);
        subjectStruct.(fidProcessed) = completedRead;
        end
 end
-
-%need to save struct as file after creating, docmat
-% write table, write something, look up - call file "subject 1" 
-% drop loop in biomedical team chat
-% october second, biomechancis data post processing 
-%g = subjectStruct.('Processed_01_M_4')
-
-% 
-% H_4 = readtable("Processed_01_H_4.csv");
-% M_4 = readtable("Processed_01_M_4.csv");
-% L_4 = readtable("Processed_01_L_4.csv");
-% 
-% H_6 = readtable("Processed_01_H_6.csv");
-% M_6 = readtable("Processed_01_M_6.csv");
-% L_6 = readtable("Processed_01_L_6.csv");
-% 
-% H_12 = readtable("Processed_01_H_12.csv");
-% M_12 = readtable("Processed_01_M_12.csv");
-% L_12 = readtable("Processed_01_L_12.csv");
-
-% goal end of loop above
+%% Reading loop - Work Power Structure
 Pos_Work_ShoulderElevationR = [];
 Neg_Work_ShoulderElevationR = [];
 Net_Work_ShoulderElevationR = [];
@@ -77,7 +43,7 @@ Neg_Impulse_ElbowFlexionR = [];
 Net_Impulse_ElbowFlexionR = [];
 
 Weight_Range = [L, M, H];
-Location_Range = [4, 6, 12];
+Location_Range = [1,2,3,4,5,6,7,8,9,10,11,12];
 
 % create new struct with fields 
 % processing loop, 
@@ -87,7 +53,7 @@ for i = 1:length(Weight_Range)
        Weight = Weight_Range(i)
        for j = 1:length(Location_Range)
            Location = Location_Range(j)
-           fidProcessed = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
+           fidProcessed = strcat('Processed_','wZG_', num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
         
            if isfield(subjectStruct,fidProcessed)          % Checking if file exists      
                 table = subjectStruct.(fidProcessed);          % Loads data from file
@@ -149,24 +115,10 @@ for i = 1:length(Weight_Range)
            end
        end
 end
-
-% possible to combine workpower struct and subject struct?
-% want to output file - do .mat file, save overall struct
-% this saves the output 
-% create names for mat file
-% save workpowerstruct and subject structure with correct name
-% 
+%% Directory Setup
 save('workpowerstruct.mat', 'WorkPowerStruct');
-
 Directory_Location = 'C:\Users\Henry\Downloads\VIPSTUFF';
-% Printing graphs, saving into folders, subject 1 goes to subject 1 folder,
-% Saving png svg, put all in folder 
-% include power, should be one extra graph 
-% edit limits on graphs 
-% make flowchart for presentation, get data, print graphs, one button
-% press, multiple subjects for one button press, 
-% gimbal locking stuff
-% Create Folders for each subject, only print within folder (not directory) 
+
 JointAngValS = strcat('Joint_Angle_Values_Shoulder_',num2str(subjectNumber,'%02d')); 
 JointAngValE = strcat('Joint_Angle_Values_Elbow_', num2str(subjectNumber,'%02d'))
 JointVelValE = strcat('Joint_Velocity_Values_Elbow_', num2str(subjectNumber,'%02d'));
@@ -175,6 +127,10 @@ JointMomValE = strcat('Joint_Moment_Values_Elbow_', num2str(subjectNumber,'%02d'
 JointPowValS = strcat('Joint_Power_Values_Shoulder_', num2str(subjectNumber,'%02d'));
 JointPowValE = strcat('Joint_Power_Values_Elbow_', num2str(subjectNumber,'%02d'));
 
+ShoulderMomentValMC = strcat('Shoulder_Moment_Values_M+C_', num2str(subjectNumber,'%02d'));
+ShoulderMomentValG = strcat('Shoulder_Moment_Values_G_', num2str(subjectNumber,'%02d'));
+ElbowMomentValMC = strcat('Elbow_Moment_Values_M+C_', num2str(subjectNumber,'%02d'));
+ElbowMomentValG = strcat('Elbow_Moment_Values_G_', num2str(subjectNumber,'%02d'));
 
 mkdir(Directory_Location,JointAngValS);
 mkdir(Directory_Location,JointAngValE);
@@ -184,7 +140,12 @@ mkdir(Directory_Location,JointMomValE);
 mkdir(Directory_Location,JointPowValS);
 mkdir(Directory_Location,JointPowValE);
 
-Locations = [4, 6, 12];
+mkdir(Directory_Location,ShoulderMomentValMC);
+mkdir(Directory_Location,ShoulderMomentValG);
+mkdir(Directory_Location,ElbowMomentValMC);
+mkdir(Directory_Location, ElbowMomentValG);
+%% Graphing Loop
+Locations = [1,2,3,4,5 6,7,8,9,10,11,12];
 Weights = [L, M, H]
 for i = 1:length(Locations)
     Location = Locations(i);
@@ -199,7 +160,7 @@ for i = 1:length(Locations)
             case 'L', legText = '$Low_{0.2\ kg}$';
             otherwise, legText = char(Weight);
          end
-        fid = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) % file ID, concatenating name, processed data
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
         fidTime = subjectStruct.(fid){2:701,1}
         fidp = subjectStruct.(fid){2:701,2}
         plot(fidTime, fidp,'LineWidth',3, 'DisplayName', legText);
@@ -223,9 +184,9 @@ for i = 1:length(Locations)
             case 'L', legText = '$Low_{0.2\ kg}$';
             otherwise, legText = char(Weight);
         end
-        fid = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) % file ID, concatenating name, processed data
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
         fidTime = subjectStruct.(fid){2:701,1}
-        fidp = subjectStruct.(fid){2:701,6}
+        fidp = subjectStruct.(fid){2:701,8}
         plot(fidTime, fidp,'LineWidth',3, 'DisplayName', legText);
         xlabel('time (s)','Interpreter','LaTex','FontSize',Font_Size);
         ylabel('Joint Angle (Deg)','Interpreter','LaTex','FontSize',Font_Size);
@@ -247,13 +208,13 @@ for i = 1:length(Locations)
             case 'L', legText = '$Low_{0.2\ kg}$';
             otherwise, legText = char(Weight);
         end
-        fid = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) % file ID, concatenating name, processed data
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
         fidTime = subjectStruct.(fid){2:701,1}
-        fidp = subjectStruct.(fid){2:701,7}
+        fidp = subjectStruct.(fid){2:701,9}
         plot(fidTime, fidp,'LineWidth',3, 'DisplayName', legText);
         xlabel('time (s)','Interpreter','LaTex','FontSize',Font_Size);
         ylabel('Joint Velocity (Deg/sec)','Interpreter','LaTex','FontSize',Font_Size);
-        ylim([-5 45])
+        ylim([-130 130])
         lh = legend('Location','best', 'Interpreter','LaTeX', 'FontSize', Font_Size);
         print(fullfile(JointVelValE, sprintf('JointVelocityLocation%d_Elbow', Location)), '-dpng');
         print(fullfile(JointVelValE, sprintf('JointVelocityLocation%d_Elbow', Location)), '-dsvg')
@@ -271,7 +232,7 @@ for i = 1:length(Locations)
             case 'L', legText = '$Low_{0.2\ kg}$';
             otherwise, legText = char(Weight);
         end
-        fid = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) % file ID, concatenating name, processed data
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
         fidTime = subjectStruct.(fid){2:701,1}
         fidp = subjectStruct.(fid){2:701,4}
         plot(fidTime, fidp,'LineWidth',3, 'DisplayName', legText);
@@ -295,9 +256,9 @@ for i = 1:length(Locations)
             case 'L', legText = '$Low_{0.2\ kg}$';
             otherwise, legText = char(Weight);
         end
-        fid = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) % file ID, concatenating name, processed data
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
         fidTime = subjectStruct.(fid){2:701,1}
-        fidp = subjectStruct.(fid){2:701,8}
+        fidp = subjectStruct.(fid){2:701,10}
         plot(fidTime, fidp,'LineWidth',3, 'DisplayName', legText);
         xlabel('time (s)','Interpreter','LaTex','FontSize',Font_Size);
         ylabel('Joint Moment (N-m)','Interpreter','LaTex','FontSize',Font_Size);
@@ -319,9 +280,9 @@ for i = 1:length(Locations)
             case 'L', legText = '$Low_{0.2\ kg}$';
             otherwise, legText = char(Weight);
         end
-        fid = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) % file ID, concatenating name, processed data
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
         fidTime = subjectStruct.(fid){2:701,1};
-        fidp = subjectStruct.(fid){2:701,5};
+        fidp = subjectStruct.(fid){2:701,7};
         plot(fidTime, fidp*(pi()/180),'LineWidth',3, 'DisplayName', legText);
         xlabel('time (s)','Interpreter','LaTex','FontSize',Font_Size);
         ylabel('Joint Power (W)','Interpreter','LaTex','FontSize',Font_Size);
@@ -343,9 +304,9 @@ for i = 1:length(Locations)
             case 'L', legText = '$Low_{0.2\ kg}$';
             otherwise, legText = char(Weight);
         end
-        fid = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) % file ID, concatenating name, processed data
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
         fidTime = subjectStruct.(fid){2:701,1};
-        fidp = subjectStruct.(fid){2:701,9};
+        fidp = subjectStruct.(fid){2:701,13};
         plot(fidTime, fidp*(pi()/180),'LineWidth',3, 'DisplayName', legText);
         xlabel('time (s)','Interpreter','LaTex','FontSize',Font_Size);
         ylabel('Joint Power (W)','Interpreter','LaTex','FontSize',Font_Size);
@@ -354,6 +315,164 @@ for i = 1:length(Locations)
         print(fullfile(JointPowValE, sprintf('JointPowerLocation%d_Elbow', Location)), '-dpng');
         print(fullfile(JointPowValE, sprintf('JointPowerLocation%d_Elbow', Location)), '-dsvg')
     end
+
+    hold off;
+    figure('Name', sprintf("Shoulder Moment Values %d M+C", Location));
+    hold on
+    grid on;
+    for j = 1:length(Weights)
+        Weight = Weights(j);
+        switch char(Weight)
+            case 'H', legText = '$High_{3.75\ kg}$';
+            case 'M', legText = '$Medium_{1.82\ kg}$';
+            case 'L', legText = '$Low_{0.2\ kg}$';
+            otherwise, legText = char(Weight);
+        end
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
+        fidTime = subjectStruct.(fid){2:701,1};
+        fidp = subjectStruct.(fid){2:701,5};
+        plot(fidTime, fidp,'LineWidth',3, 'DisplayName', legText);
+        xlabel('time (s)','Interpreter','LaTex','FontSize',Font_Size);
+        ylabel('Shoulder Moment M+C (N-m)','Interpreter','LaTex','FontSize',Font_Size);
+        ylim([-80 100])
+        lh = legend('Location','best', 'Interpreter','LaTeX', 'FontSize', Font_Size);
+        print(fullfile(ShoulderMomentValMC, sprintf('ShoulderMomentMCLocation%d', Location)), '-dpng');
+        print(fullfile(ShoulderMomentValMC, sprintf('ShoulderMomentMCLocation%d', Location)), '-dsvg')
+    end
+
+    hold off;
+    figure('Name', sprintf("Shoulder Moment Values %d G", Location));
+    hold on
+    grid on;
+    for j = 1:length(Weights)
+        Weight = Weights(j);
+        switch char(Weight)
+            case 'H', legText = '$High_{3.75\ kg}$';
+            case 'M', legText = '$Medium_{1.82\ kg}$';
+            case 'L', legText = '$Low_{0.2\ kg}$';
+            otherwise, legText = char(Weight);
+        end
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
+        fidTime = subjectStruct.(fid){2:701,1};
+        fidp = subjectStruct.(fid){2:701,6};
+        plot(fidTime, fidp,'LineWidth',3, 'DisplayName', legText);
+        xlabel('time (s)','Interpreter','LaTex','FontSize',Font_Size);
+        ylabel('Shoulder Moment G (N-m)','Interpreter','LaTex','FontSize',Font_Size);
+        ylim([-80 100])
+        lh = legend('Location','best', 'Interpreter','LaTeX', 'FontSize', Font_Size);
+        print(fullfile(ShoulderMomentValG, sprintf('ShoulderMomentGLocation%d', Location)), '-dpng');
+        print(fullfile(ShoulderMomentValG, sprintf('ShoulderMomentMCLocation%d', Location)), '-dsvg')
+    end
+
+    hold off;
+    figure('Name', sprintf("Elbow Moment Values %d M+C", Location));
+    hold on
+    grid on;
+    for j = 1:length(Weights)
+        Weight = Weights(j);
+        switch char(Weight)
+            case 'H', legText = '$High_{3.75\ kg}$';
+            case 'M', legText = '$Medium_{1.82\ kg}$';
+            case 'L', legText = '$Low_{0.2\ kg}$';
+            otherwise, legText = char(Weight);
+        end
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
+        fidTime = subjectStruct.(fid){2:701,1};
+        fidp = subjectStruct.(fid){2:701,11};
+        plot(fidTime, fidp,'LineWidth',3, 'DisplayName', legText);
+        xlabel('time (s)','Interpreter','LaTex','FontSize',Font_Size);
+        ylabel('Elbow Moment M+C (N-m)','Interpreter','LaTex','FontSize',Font_Size);
+        ylim([-20 20])
+        lh = legend('Location','best', 'Interpreter','LaTeX', 'FontSize', Font_Size);
+        print(fullfile(ElbowMomentValMC, sprintf('ElbowMomentMCLocation%d', Location)), '-dpng');
+        print(fullfile(ElbowMomentValMC, sprintf('ElbowMomentMCLocation%d', Location)), '-dsvg')
+    end
+
+    hold off;
+    figure('Name', sprintf("Elbow Moment Values %d G", Location));
+    hold on
+    grid on;
+    for j = 1:length(Weights)
+        Weight = Weights(j);
+        switch char(Weight)
+            case 'H', legText = '$High_{3.75\ kg}$';
+            case 'M', legText = '$Medium_{1.82\ kg}$';
+            case 'L', legText = '$Low_{0.2\ kg}$';
+            otherwise, legText = char(Weight);
+        end
+        fid = strcat('Processed_','wZG_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location))
+        fidTime = subjectStruct.(fid){2:701,1};
+        fidp = subjectStruct.(fid){2:701,12};
+        plot(fidTime, fidp,'LineWidth',3, 'DisplayName', legText);
+        xlabel('time (s)','Interpreter','LaTex','FontSize',Font_Size);
+        ylabel('Elbow Moment G (N-m)','Interpreter','LaTex','FontSize',Font_Size);
+        ylim([-20 20])
+        lh = legend('Location','best', 'Interpreter','LaTeX', 'FontSize', Font_Size);
+        print(fullfile(ShoulderMomentValG, sprintf('ElbowMomentGLocation%d', Location)), '-dpng');
+        print(fullfile(ShoulderMomentValG, sprintf('ElbowMomentGLocation%d', Location)), '-dsvg')
+    end
 end
 
+%% Bar graph code
+figure('Name','Work','Position',[100 100 550 700])
+sgtitle('\textbf{Work}','Interpreter','LaTeX','FontSize',22);
+Net_Work = [];
+Pos_Work = [];
+Neg_Work = [];
 
+for i = 1:length(Locations)
+    Location = Locations(i)
+    for j = 1:length(Weights)
+        Weight = Weights(j)
+        fidProcessed = strcat('Processed_',num2str(subjectNumber,'%02d'),'_', char(Weight), '_', num2str(Location)) 
+        if isfield(WorkPowerStruct, fidProcessed)
+            entry = WorkPowerStruct.(fidProcessed);
+            Net_Work = [Net_Work entry.Net_Work_ShoulderElevationR];
+            Pos_Work = [Pos_Work entry.Pos_Work_ShoulderElevationR];
+            Neg_Work = [Neg_Work entry.Neg_Work_ShoulderElevationR];
+        end
+    end
+end
+
+xLabels = strings(1, length(Net_Work));
+idx = 1;
+for i = 1:length(Weights)
+    for j = 1:length(Locations)
+        xLabels(idx) = sprintf('%s-%c', char(Weights(i)), num2str(i));
+        idx = idx + 1;
+    end
+end
+
+err = zeros(size(Net_Work)); 
+
+colors = zeros(length(Net_Work),3);
+for i = 1:length(Weights)
+    for j = 1:length(Locations)
+        idx = (i-1)*length(Locations) + j;
+        switch Weights(i)
+            case 'L', colors(idx,:) = [0 0 1];
+            case 'M', colors(idx,:) = [0 1 0];
+            case 'H', colors(idx,:) = [1 0 0];
+        end
+    end
+end
+
+titles = {'Net Work (J)', 'Pos Work (J)', 'Neg Work (J)'};
+workSets = {Net_Work, Pos_Work, Neg_Work};
+yLims = {[-50 50], [0 50], [-50 0]};
+
+for k = 1:3
+    subplot(3,1,k); hold on; grid on;
+    b = bar(workSets{k}, 'FaceColor','flat');
+    for i = 1:length(workSets{k})
+        b.CData(i,:) = colors(i,:);
+    end
+    errorbar(1:length(workSets{k}), workSets{k}, err, 'k.', 'LineWidth',1.3);
+    ylabel(titles{k},'Interpreter','LaTeX','FontSize',12);
+    xticks(1:length(xLabels)); xticklabels(xLabels);
+    ylim(yLims{k});
+    set(gca,'FontSize',11);
+    if k == 3
+        xlabel('Weight - Task Location','Interpreter','LaTeX','FontSize',13);
+    end
+end
