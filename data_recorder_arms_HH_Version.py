@@ -19,6 +19,7 @@ import numpy as np
 from epicallypowerful.toolbox import LoopTimer, DataRecorder
 from epicallypowerful.sensing import MicrostrainImus
 from xscore_driver.driver import XSensorDataConsumer
+import msvcrt
 
 ##################################################################
 # SET CLOCK SPECIFICATIONS
@@ -152,6 +153,11 @@ while True:
         # Iterate through all connected IMUs
         data = []
 
+        if msvcrt.kbhit():
+            key = msvcrt.getch()
+            if key == b'S':
+                break
+
         for imu_id in MICROSTRAIN_IMU_IDS:
             raw_imu_data = microstrain_imus.get_data(imu_id=imu_id)
 
@@ -161,6 +167,7 @@ while True:
             # Print out raw linear acceleration for current sensor, print out here for name 
             print(f"{imu_id} - {IMU_LOCATION_NAME[imu_id]} | ({raw_imu_data.accx:.2f}, {raw_imu_data.accy:.2f}, {raw_imu_data.accz:.2f})")
         
+
         # Iterate through all connected XSENSOR insoles
         for insole in INSOLE_LOCATIONS:
             raw_insole_data = xsensor_insoles.get_data(insole)
