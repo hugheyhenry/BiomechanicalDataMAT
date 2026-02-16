@@ -31,8 +31,11 @@ clocking_loop = LoopTimer(LOOP_RATE)
 # SET UP MICROSTRAIN IMUS
 ##################################################################
 
+# add in "what sensor ids do you want?"
+# ask what ids do you want, promt to type in 
+# Ask what IDs you want before, create array, type it in english 
 
-MICROSTRAIN_IMU_IDS =  ['198247','198238','198240','198237','198236','198248','198239','198246']
+#MICROSTRAIN_IMU_IDS =  ['198247','198238','198240','198237','198236','198248','198239','198246']
 IMU_LOCATION_NAME = {
     '198247': 'Xiphoid',
     '198238': 'R Triceps',
@@ -43,6 +46,16 @@ IMU_LOCATION_NAME = {
     '198239': 'R Forearm',
     '198246': 'R Shoulder'
 }
+
+user_input = input("Type locations separated by commas: ")
+locations = [loc.strip() for loc in user_input.split(",")]
+
+LOCATION_TO_ID = {v: k for k, v in IMU_LOCATION_NAME.items()}
+MICROSTRAIN_IMU_IDS = [
+    LOCATION_TO_ID[loc]
+    for loc in locations
+    if loc in LOCATION_TO_ID
+]
 
 MICROSTRAIN_IMU_RATE = LOOP_RATE # Set collection rate of IMUs
 TARE_ON_STARTUP = False # Zero orientation on startup?
