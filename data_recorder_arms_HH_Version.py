@@ -19,7 +19,11 @@ import numpy as np
 from epicallypowerful.toolbox import LoopTimer, DataRecorder
 from epicallypowerful.sensing import MicrostrainImus
 from xscore_driver.driver import XSensorDataConsumer
-import msvcrt
+import sys
+import termios
+import tty
+import select
+
 
 ##################################################################
 # SET CLOCK SPECIFICATIONS
@@ -146,38 +150,54 @@ data_recorder = DataRecorder(save_dir+trial_name, features_to_record, buffer_lim
 # MAIN CONTROLLER LOOP
 ##################################################################
 
+def get_key():
+        dr, dw, de = select.select([sys.stdin], [], [], 0)
+        if dr:
+            return sys.stdin.read(1)
+        return None
+
+old_settings = termios.tcgetattr(sys.stdin)
+
+
+
 # Continuously stream and record data
 # Put in restart program 
-while True:
-    if clocking_loop.continue_loop():
-        # Iterate through all connected IMUs
-        data = []
 
-        if msvcrt.kbhit():
-            key = msvcrt.getch()
-            if key == b'S':
-                break
 
-        for imu_id in MICROSTRAIN_IMU_IDS:
-            raw_imu_data = microstrain_imus.get_data(imu_id=imu_id)
+try:
+    tty.setcbreak(sys.stdin.fileno())
+    while True:
+        key = get_key()
 
-            for channel in MICROSTRAIN_IMU_CHANNELS:
-              data.extend([getattr(raw_imu_data, channel, 0)])
-
-            # Print out raw linear acceleration for current sensor, print out here for name 
-            print(f"{imu_id} - {IMU_LOCATION_NAME[imu_id]} | ({raw_imu_data.accx:.2f}, {raw_imu_data.accy:.2f}, {raw_imu_data.accz:.2f})")
-        
-
-        # Iterate through all connected XSENSOR insoles
-        for insole in INSOLE_LOCATIONS:
-            raw_insole_data = xsensor_insoles.get_data(insole)
+        if key == "S":
+            print("Stopping loop...")
+            break
+        if clocking_loop.continue_loop():
             
-            for channel in INSOLE_CHANNELS:
-                data.extend([getattr(raw_insole_data, channel, 0)])
+            # Iterate through all connected IMUs
+            data = []
+            
+            for imu_id in MICROSTRAIN_IMU_IDS:
+                raw_imu_data = microstrain_imus.get_data(imu_id=imu_id)
 
-        # Log data to file
-        data_recorder.save(data)
+                for channel in MICROSTRAIN_IMU_CHANNELS:
+                    data.extend([getattr(raw_imu_data, channel, 0)])
 
+                # Print out raw linear acceleration for current sensor, print out here for name 
+                print(f"{imu_id} - {IMU_LOCATION_NAME[imu_id]} | ({raw_imu_data.accx:.2f}, {raw_imu_data.accy:.2f}, {raw_imu_data.accz:.2f})")
+            
+
+            # Iterate through all connected XSENSOR insoles
+            for insole in INSOLE_LOCATIONS:
+                raw_insole_data = xsensor_insoles.get_data(insole)
+                
+                for channel in INSOLE_CHANNELS:
+                    data.extend([getattr(raw_insole_data, channel, 0)])
+
+            # Log data to file
+    data_recorder.save(data)
+finally:
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
 
 data_recorder.finalize()
  
