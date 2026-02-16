@@ -35,18 +35,20 @@ clocking_loop = LoopTimer(LOOP_RATE)
 # ask what ids do you want, promt to type in 
 # Ask what IDs you want before, create array, type it in english 
 
-#MICROSTRAIN_IMU_IDS =  ['198247','198238','198240','198237','198236','198248','198239','198246']
+
 IMU_LOCATION_NAME = {
     '198247': 'Xiphoid',
     '198238': 'R Triceps',
     '198240': 'L Triceps',
     '198237': 'L Shoulder',
-    '198236': 'L Forearm ',
+    '198236': 'L Forearm',
     '198248': 'Neck',
     '198239': 'R Forearm',
-    '198246': 'R Shoulder'
+    '198246': 'R Shoulder',
+    '198235': 'R hand'
 }
 
+print('Xiphoid - R Triceps - L Triceps - L Shoulder - L Forearm - Neck - R Forearm -R Shoulder - R hand')
 user_input = input("Type locations separated by commas: ")
 locations = [loc.strip() for loc in user_input.split(",")]
 
